@@ -38,7 +38,7 @@ const itemResult = () => {
                 setDescription("1. 뉴발란스 4종 팬티 L 사이즈");
                 break;
             case 2 :
-                setDescription("2. 길라델리 초콜렛 2개");
+                setDescription("2. 길라델리 초콜렛 1개");
                 break;
             case 3 :
                 setDescription("3. 마이클 코스 3종팬티 M 사이즈");

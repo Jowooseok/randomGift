@@ -102,16 +102,48 @@ const itemCheck = () => {
         const rand_1_14 = Math.floor(Math.random() * 14) + 1;
 
         const docRef = doc(db, "login", "UHGsPPaf4Q5YHjOCMFFP");
-        const data = {
-            [phoneNumber] : {
-                "check" : rand_1_14,
-                "name" : name,
-            }
+        const docSnap = await getDoc(docRef);
+
+        let stockItems = docSnap.get("checkItem");
+        const stockItem = stockItems[rand_1_14-1];
+
+        if(!docSnap.get(phoneNumber).check === -1) {
+            await router.push(`/itemResult?phoneNumber=${phoneNumber}&&name=${docSnap.get(phoneNumber).name}`)
+            return;
         }
-        await updateDoc(docRef, data);
-        setInterval(()=>{
-            router.push(`/itemResult?result=${rand_1_14}&&phoneNumber=${phoneNumber}&&name=${name}`)
-        },3000);
+
+        if (docSnap.exists()) {
+            if (stockItem > 0) { //재고수량이 있고 상품확인을 안했으면
+                const personData = {
+                    [phoneNumber] : {
+                        "check" : rand_1_14,
+                        "name" : name,
+                    }
+                }
+
+                stockItems[rand_1_14-1] = stockItem - 1;
+
+                const stockData = {
+                    checkItem : stockItems
+                }
+
+                await updateDoc(docRef, personData); //당첨 물건 입력
+                await updateDoc(docRef, stockData); //당첨 물건 입력
+
+                setInterval(()=>{
+                    router.push(`/itemResult?result=${rand_1_14}&&phoneNumber=${phoneNumber}&&name=${name}`)
+                },3000);
+
+            }else{
+                //재고가 없는 상품 당첨시 초콜릿으로 당첨 후 넘기기
+                await handleStart();
+            }
+
+        }else{
+            alert("재고가 모두 소진되었습니다!")
+            await router.push('/');
+        }
+
     };
 
     const handlePrizeDefined = () => {
